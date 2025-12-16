@@ -22,27 +22,6 @@ trait ContextFactory<'a, T: ?Sized> {
     fn borrow_mut(&'a mut self, this: &'a mut Self::CtxRef) -> Self::RefMut;
 }
 
-struct RcFactory;
-
-impl<'a, T: 'a + ?Sized> ContextFactory<'a, T> for RcFactory {
-    type CtxRef = Rc<T>;
-    type Ref = &'a T;
-    type RefMut = &'a mut T;
-
-    fn new(&mut self, inner: T) -> Self::CtxRef
-    where
-        T: Sized,
-    {
-        Rc::new(inner)
-    }
-
-    fn borrow(&'a self, this: &'a Self::CtxRef) -> Self::Ref { &*this }
-
-    fn borrow_mut(&'a mut self, this: &'a mut Self::CtxRef) -> Self::RefMut {
-        unsafe { Rc::get_mut_unchecked(this) }
-    }
-}
-
 struct RefCellFactory<T: ?Sized> {
     arena: Arena<Box<RefCell<T>>>,
 }
